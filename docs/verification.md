@@ -4,6 +4,24 @@ The current native prerelease is **SSH Sessions 0.8.0**, implemented in Rust.
 macOS remains **beta**. Hosted pseudo-terminal tests do not qualify every
 physical desktop, terminal emulator, SSH agent, proxy or VPN configuration.
 
+## 0.9.0 prerelease (November 19, 2026)
+
+The immutable [0.9.0 release](https://github.com/brant92good/ssh-session-tui/releases/tag/v0.9.0)
+at `4cf62cbbea8444215ca1b60f88208015320e15cb` passed
+[all eleven native release jobs](https://github.com/brant92good/ssh-session-tui/actions/runs/44559802520):
+five platform builds/tests, publication and five actual released-installer jobs.
+Windows x64, Linux x64/ARM64 and macOS Intel/Apple Silicon are included. The
+Apple Silicon jobs moved to the `macos-15` image because GitHub no longer offers
+`macos-14` arm64 runners. macOS terminal CI remains separate from desktop
+qualification, and hosted CI does not run Herdr.
+
+An independent macOS check downloaded the published Apple Silicon binary and
+matched both its sidecar and GitHub asset digest. SHA-256:
+`1db455b2ae357af1832c249e15a1e07437a93c9a5ca1bc2fc26a45623cf9700e`.
+The H key itself was qualified from source on one Apple Silicon Mac; see
+[Herdr handoff](#herdr-handoff--source-qualification-november-19-2026).
+Independent Windows desktop checks of 0.9.0 have not been run.
+
 ## 0.8.0 prerelease (September 11, 2026)
 
 The immutable [0.8.0 release](https://github.com/brant92good/ssh-session-tui/releases/tag/v0.8.0)

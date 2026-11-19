@@ -1,9 +1,8 @@
 # Install SSH Sessions
 
-> **0.9.0 release candidate:** the commands target the new release; its assets
-> and HTTPS installation checks are pending. The qualified published prerelease
-> is 0.8.0. See [verification](verification.md) for tested paths and the
-> remaining macOS desktop beta boundary.
+> **0.9.0 prerelease:** compiled downloads and HTTPS installation checks have
+> passed. See [verification](verification.md#090-prerelease-november-19-2026)
+> for tested paths and the remaining macOS desktop beta boundary.
 
 The [README commands](../README.md#install) download a compiled Rust executable
 for your OS and CPU, verify its SHA-256 checksum, and add its `bin` directory to
