@@ -253,6 +253,41 @@ mod tests {
     }
 
     #[test]
+    fn alias_bound_to_another_ssh_config_is_refused_before_any_command_is_built() {
+        let temp = tempfile::tempdir().unwrap();
+        let catalog = catalog(&temp);
+        let config = temp.path().join("other config");
+        fs::write(&config, b"Host work-box\n  HostName old.example.test\n").unwrap();
+        let dev = machine("dev");
+        let bound = route("192.0.2.18", 2222, Some("work-box"));
+        let bindings = std::collections::BTreeMap::from([("lab/lan", config.to_str().unwrap())]);
+        write_json(
+            &catalog.device_path.with_extension("ssh-configs.json"),
+            &bindings,
+        )
+        .unwrap();
+        let error = launch(
+            &catalog,
+            Path::new("/opt/example/herdr"),
+            Some((&dev, &bound)),
+        )
+        .unwrap_err()
+        .to_string();
+        assert!(error.contains("default SSH config"), "{error}");
+        // An alias that exists in no config is reported by the existing import check.
+        let missing = route("192.0.2.18", 22, Some("nowhere-box"));
+        fs::remove_file(catalog.device_path.with_extension("ssh-configs.json")).unwrap();
+        assert!(
+            launch(
+                &catalog,
+                Path::new("/opt/example/herdr"),
+                Some((&dev, &missing))
+            )
+            .is_err()
+        );
+    }
+
+    #[test]
     fn explicit_program_must_exist_and_missing_herdr_explains_itself() {
         let temp = tempfile::tempdir().unwrap();
         let file = temp.path().join("herdr");

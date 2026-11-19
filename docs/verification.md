@@ -30,6 +30,30 @@ desktop, personal SSH server or OS file drag/drop result is implied.
 
 ## Native checks
 
+### Herdr handoff — source qualification (November 19, 2026)
+
+The H key was checked from source on macOS 26 (Apple Silicon, Rust 1.100) before
+the 0.9.0 tag. `cargo test --locked` and
+`cargo clippy --locked --all-targets --all-features -- -D warnings` passed. New
+tests cover the SSH target for addresses, aliases and IPv6 literals, refused
+addresses, the local and remote command lines, an alias bound to a non-default
+SSH config, `HERDR_BIN` discovery, the device-local list of confirmed machines,
+and the picker flow: Local terminal opens directly, a machine asks for a route
+and then for a one-time confirmation that Enter cannot answer, and H stays
+ordinary text in search and forms.
+
+The release binary was also driven in an owned pseudo-terminal against a real
+private catalog in a temporary state directory, with a recording stand-in set as
+`HERDR_BIN`. It launched the stand-in with no arguments for Local terminal and
+with `--remote ssh://user@alias:22` for a machine after the route choice and
+**Y**. Real Herdr 0.9.5 then attached to an existing remote Herdr server using
+that exact alias target.
+
+Not covered: Windows and Linux desktops, a first attach that installs Herdr on
+the remote machine, address-only routes with real Herdr, and Herdr's own
+failure messages. Hosted CI for the tag adds the five platform builds and
+tests; it does not run Herdr.
+
 ### Files chooser and saved paths — source qualification (September 11, 2026)
 
 The current source adds the Files start screen and a separate named-path file.

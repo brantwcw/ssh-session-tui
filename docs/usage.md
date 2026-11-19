@@ -147,7 +147,7 @@ arguments. Without it, the same explicit command opens the companion directly.
 | A / E / D | Add / edit / delete a machine |
 | R / I | Routes / SSH import |
 | X | Open SSH Files for the selected machine and route |
-| H | Open Herdr on the selected machine and route, or local Herdr on Local terminal (unreleased) |
+| H | Open Herdr on the selected machine and route, or local Herdr on Local terminal (0.9+) |
 | S | Pull / Publish |
 | F5 / F1 | Reload / keyboard guide |
 | Ctrl+L / Q | Local shell / close picker |
