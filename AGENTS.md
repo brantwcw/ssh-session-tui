@@ -16,6 +16,13 @@ handoff, preserve alias plus explicit HostName, and reject stale catalog/binding
 preparation. Discovery and files --json never launch a program or connect. An
 invalid explicit SSH_FILES_BIN errors; Files failures never trigger SSH fallback
 or change the device preference. Keep companion authentication policy in its leaf.
+The optional Herdr handoff is in src/herdr.rs. H opens `herdr` on Local terminal
+or `herdr --remote ssh://user@host:port` for the frozen machine route; Enter stays
+plain SSH. Discovery never launches a program. Ask once per machine per device
+before the first remote attach (device-local `.herdr.json`), with Y only, never
+Enter. Refuse a route whose alias is bound to a non-default SSH config, and any
+address that is not a plain host, alias or IPv6 literal. Herdr failures never
+trigger SSH fallback or change the device preference.
 The dedicated Files chooser is in src/files_picker.rs; `files` without a machine
 opens it, while explicit `files MACHINE --json` remains read-only. Keep its tree
 selection keyed by stable group/machine/preset IDs. R is a one-session route

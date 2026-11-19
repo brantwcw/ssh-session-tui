@@ -330,6 +330,17 @@ impl Picker {
                 KeyCode::Esc | KeyCode::Char('n' | 'N') => self.screen = *return_to,
                 _ => {}
             },
+            Screen::HerdrFirstUse { machine, route } => match key.code {
+                // Y only: a queued Enter from the main list must never confirm.
+                KeyCode::Char('y' | 'Y') => {
+                    self.screen = Screen::Main;
+                    self.ensure_current()?;
+                    herdr::Known::remember(&self.catalog, &machine.id)?;
+                    self.choice = Some(Choice::Herdr(Some((machine, route))));
+                }
+                KeyCode::Esc | KeyCode::Char('n' | 'N') => self.screen = Screen::Main,
+                _ => {}
+            },
             Screen::Help => {
                 if matches!(key.code, KeyCode::Esc | KeyCode::F(1) | KeyCode::Enter) {
                     self.screen = Screen::Main;
@@ -394,6 +405,13 @@ impl Picker {
                     .intersects(KeyModifiers::CONTROL | KeyModifiers::ALT) =>
             {
                 self.open(&self.current(), SessionAction::Files)?
+            }
+            KeyCode::Char('h' | 'H')
+                if !key
+                    .modifiers
+                    .intersects(KeyModifiers::CONTROL | KeyModifiers::ALT) =>
+            {
+                self.open(&self.current(), SessionAction::Herdr)?
             }
             KeyCode::Char('l') if ctrl => self.choice = Some(Choice::Local),
             KeyCode::Char('c') if ctrl => self.choice = Some(Choice::Quit),

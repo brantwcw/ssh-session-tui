@@ -20,20 +20,20 @@ you log out. Your existing SSH client handles the connection.
 
 ## Install
 
-> **0.8.0 prerelease:** compiled downloads and their HTTPS installers have passed
-> the [release checks](docs/verification.md#080-prerelease-september-11-2026).
+> **0.9.0 prerelease:** compiled downloads and their HTTPS installers have passed
+> the [release checks](docs/verification.md#090-prerelease-november-19-2026).
 > macOS remains beta pending desktop qualification.
 
 **Windows — paste into PowerShell:**
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -Command "irm https://raw.githubusercontent.com/brant92good/ssh-session-tui/v0.8.0/install.ps1 | iex"
+powershell -NoProfile -ExecutionPolicy Bypass -Command "irm https://raw.githubusercontent.com/brant92good/ssh-session-tui/v0.9.0/install.ps1 | iex"
 ```
 
 **Linux / macOS:**
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/brant92good/ssh-session-tui/v0.8.0/install.sh | sh
+curl -fsSL https://raw.githubusercontent.com/brant92good/ssh-session-tui/v0.9.0/install.sh | sh
 ```
 
 Run **`ssh-sessions`** in a new terminal. Press **I** to import SSH hosts or **A**
@@ -49,7 +49,7 @@ Git is optional for sharing a catalog. [Install, update and uninstall](docs/inst
 | Linux | x64, ARM64 | Native terminal; static binary |
 | macOS | Apple Silicon, Intel | **Beta** — hosted terminal tests, desktop qualification ongoing |
 
-[Release files and checksums](https://github.com/brant92good/ssh-session-tui/releases/tag/v0.8.0)
+[Release files and checksums](https://github.com/brant92good/ssh-session-tui/releases/tag/v0.9.0)
 are available for each platform above. See [verification](docs/verification.md)
 for the published-download tests and what remains unqualified.
 
@@ -99,6 +99,19 @@ key-agent setup. Files needs authentication that works without a prompt; a
 password-only login is not enough. It never silently changes your route after
 a failure.
 
+## Herdr on the machine you selected
+
+Press **H** to open [Herdr](https://herdr.dev) for the selected row: local Herdr on
+**Local terminal**, or Herdr attached to that machine through its route. **Enter**
+still opens a plain SSH session.
+
+The first time this device opens Herdr on a machine, the picker asks before
+continuing, because Herdr's remote attach may install Herdr there. Herdr reads SSH
+aliases from your default SSH config, so a route imported from another config
+file is refused with a message instead of connecting somewhere else. Install
+Herdr separately; set `HERDR_BIN` to an absolute path if it is not on PATH. **New in 0.9.0**, a
+prerelease; [verification](docs/verification.md) records its qualification.
+
 ### Start Files from your server list
 
 **New in 0.8.0:** a Files chooser with named remote paths. This version is a
@@ -139,6 +152,7 @@ are passed literally: `~` and `$HOME` are not expanded by your local shell.
 | A / E / D | Add / edit / delete a machine |
 | R / I | Choose a route / import SSH hosts |
 | X | Open the optional SSH Files companion |
+| H | Open Herdr on the selected machine, or local Herdr (0.9+) |
 | Space / Ctrl+A | Mark one machine / all shown |
 | M / T | Move machines / edit tags |
 | S | Pull or publish the catalog |

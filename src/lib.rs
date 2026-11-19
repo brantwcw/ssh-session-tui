@@ -4,6 +4,7 @@ pub mod favorites;
 pub mod file_presets;
 pub mod files;
 pub mod files_picker;
+pub mod herdr;
 pub mod organization;
 pub mod ssh_import;
 pub mod sync;

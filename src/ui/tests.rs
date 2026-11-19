@@ -441,3 +441,72 @@ fn favorite_activation_and_menu_reload_cross_view_changes() {
         Some(LOCAL)
     );
 }
+
+#[test]
+fn herdr_opens_local_directly_and_asks_once_before_a_machines_first_attach() {
+    let (_temp, mut picker) = fixture();
+    // Favorite 2 is Local terminal: H needs no route and no confirmation.
+    press(&mut picker, KeyCode::Char('2'));
+    press(&mut picker, KeyCode::Char('h'));
+    assert!(matches!(picker.choice, Some(Choice::Herdr(None))));
+    picker.choice = None;
+
+    // A machine without a chosen route asks for the route first, like Enter and X.
+    press(&mut picker, KeyCode::Char('1'));
+    press(&mut picker, KeyCode::Char('H'));
+    assert!(matches!(
+        picker.screen,
+        Screen::Routes {
+            after: Some(SessionAction::Herdr),
+            fallback: false,
+            ..
+        }
+    ));
+    press(&mut picker, KeyCode::Enter);
+    // First attach from this device: a confirmation that Enter cannot answer.
+    assert!(matches!(picker.screen, Screen::HerdrFirstUse { .. }));
+    assert!(render(&picker, 100, 30).contains("install Herdr on that machine"));
+    press(&mut picker, KeyCode::Enter);
+    assert!(picker.choice.is_none());
+    assert!(matches!(picker.screen, Screen::HerdrFirstUse { .. }));
+    press(&mut picker, KeyCode::Char('n'));
+    assert!(matches!(picker.screen, Screen::Main));
+    assert!(picker.choice.is_none());
+    assert!(!herdr::Known::load(&picker.catalog).unwrap().contains("lab"));
+
+    press(&mut picker, KeyCode::Char('h'));
+    assert!(matches!(picker.screen, Screen::HerdrFirstUse { .. }));
+    press(&mut picker, KeyCode::Char('y'));
+    match picker.choice.take() {
+        Some(Choice::Herdr(Some((machine, route)))) => {
+            assert_eq!(machine.id, "lab");
+            assert_eq!(route.id, "lan");
+        }
+        other => panic!("unexpected choice: {other:?}"),
+    }
+    assert!(herdr::Known::load(&picker.catalog).unwrap().contains("lab"));
+
+    // The same machine opens without asking again; another machine still asks.
+    press(&mut picker, KeyCode::Char('h'));
+    assert!(matches!(picker.choice, Some(Choice::Herdr(Some(_)))));
+}
+
+#[test]
+fn herdr_key_stays_text_in_search_and_forms_and_shows_in_the_guide() {
+    let (_temp, mut picker) = fixture();
+    press(&mut picker, KeyCode::Char('/'));
+    type_text(&mut picker, "hh");
+    assert_eq!(picker.query.text, "hh");
+    assert!(picker.choice.is_none());
+    press(&mut picker, KeyCode::Esc);
+    press(&mut picker, KeyCode::Char('a'));
+    type_text(&mut picker, "Home lab");
+    assert!(
+        matches!(&picker.screen, Screen::Form(form) if form.fields[0].input.text == "Home lab")
+    );
+    assert!(picker.choice.is_none());
+    press(&mut picker, KeyCode::Esc);
+    assert!(render(&picker, 120, 30).contains("H Herdr"));
+    press(&mut picker, KeyCode::F(1));
+    assert!(render(&picker, 120, 34).contains("Open Herdr on the selected machine"));
+}

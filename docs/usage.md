@@ -147,11 +147,20 @@ arguments. Without it, the same explicit command opens the companion directly.
 | A / E / D | Add / edit / delete a machine |
 | R / I | Routes / SSH import |
 | X | Open SSH Files for the selected machine and route |
+| H | Open Herdr on the selected machine and route, or local Herdr on Local terminal (0.9+) |
 | S | Pull / Publish |
 | F5 / F1 | Reload / keyboard guide |
 | Ctrl+L / Q | Local shell / close picker |
 
 Forms use Tab to move, Ctrl+S to save and Esc to cancel.
+
+**H** hands the selected row to [Herdr](https://herdr.dev): `herdr` for Local
+terminal, or `herdr --remote ssh://user@host:port` for a machine, using the SSH
+alias as the host when the route has one. The picker asks once per machine on
+each device before the first attach, and only **Y** confirms. A route whose
+alias lives in a non-default SSH config is refused, because Herdr reads only
+the default config. If Herdr exits with an error its message stays on screen
+until Enter, and no other route or plain SSH session is tried for you.
 
 ## Share a catalog through Git
 
