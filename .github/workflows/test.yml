@@ -9,7 +9,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [windows-latest, ubuntu-24.04, macos-14]
+        os: [windows-latest, ubuntu-24.04, macos-15]
         python: ['3.12', '3.13']
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262

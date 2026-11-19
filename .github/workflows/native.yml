@@ -18,7 +18,7 @@ jobs:
           - os: ubuntu-24.04-arm
             target: aarch64-unknown-linux-musl
             rustflags: ''
-          - os: macos-14
+          - os: macos-15
             target: aarch64-apple-darwin
             rustflags: ''
           - os: macos-15-intel
@@ -113,7 +113,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [windows-2025, ubuntu-24.04, ubuntu-24.04-arm, macos-14, macos-15-intel]
+        os: [windows-2025, ubuntu-24.04, ubuntu-24.04-arm, macos-15, macos-15-intel]
     runs-on: ${{ matrix.os }}
     timeout-minutes: 15
     steps:
