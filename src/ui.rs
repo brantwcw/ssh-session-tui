@@ -13,7 +13,7 @@ use crate::{
     catalog::{self, Catalog, Machine, Route, Snapshot},
     connection,
     favorites::{Favorites, LOCAL},
-    files, organization,
+    files, herdr, organization,
     ssh_import::{self, Scan},
 };
 use anyhow::{Context, Result, ensure};
@@ -123,6 +123,7 @@ enum Delete {
 enum SessionAction {
     Connect,
     Files,
+    Herdr,
 }
 #[derive(Debug, Clone)]
 enum Screen {
@@ -158,6 +159,11 @@ enum Screen {
         revision: String,
         return_to: Box<Screen>,
     },
+    /// First Herdr attach to a machine from this device; it may install Herdr there.
+    HerdrFirstUse {
+        machine: Box<Machine>,
+        route: Route,
+    },
     Help,
     Sync,
     Busy,
@@ -167,6 +173,8 @@ pub enum Choice {
     Local,
     Connect(Box<Machine>, Route),
     Files(files::Launch),
+    /// Herdr on a frozen machine route, or local Herdr for `None`.
+    Herdr(Option<(Box<Machine>, Route)>),
     Quit,
 }
 
@@ -367,7 +375,22 @@ impl Picker {
         route: Route,
         action: SessionAction,
     ) -> Result<()> {
+        if action == SessionAction::Herdr
+            && !herdr::Known::load(&self.catalog)?.contains(&machine.id)
+        {
+            // Refuse an unusable address before asking, so Y never leads to a dead end.
+            herdr::target(&machine, &route)?;
+            self.screen = Screen::HerdrFirstUse {
+                machine: Box::new(machine),
+                route,
+            };
+            return Ok(());
+        }
         self.choice = Some(match action {
+            SessionAction::Herdr => {
+                herdr::target(&machine, &route)?;
+                Choice::Herdr(Some((Box::new(machine), route)))
+            }
             SessionAction::Connect => Choice::Connect(Box::new(machine), route),
             SessionAction::Files => Choice::Files(files::prepare(
                 &self.catalog,
@@ -387,11 +410,13 @@ impl Picker {
         );
         self.ensure_current()?;
         if id == LOCAL {
-            ensure!(
-                action == SessionAction::Connect,
-                "Choose a remote machine to open SSH Files."
-            );
-            self.choice = Some(Choice::Local);
+            self.choice = Some(match action {
+                SessionAction::Connect => Choice::Local,
+                SessionAction::Herdr => Choice::Herdr(None),
+                SessionAction::Files => {
+                    anyhow::bail!("Choose a remote machine to open SSH Files.")
+                }
+            });
             return Ok(());
         }
         let machine = self.machine(id)?.clone();
@@ -651,6 +676,24 @@ pub fn picker_loop(catalog: &Catalog) -> Result<()> {
                 )
             }
             Choice::Files(launch) => (Ok(launch.argv), launch.title, None, "SSH Files"),
+            Choice::Herdr(selection) => {
+                let launch = herdr::executable().and_then(|program| {
+                    herdr::launch(
+                        catalog,
+                        &program,
+                        selection
+                            .as_ref()
+                            .map(|(machine, route)| (machine.as_ref(), route)),
+                    )
+                });
+                if let Some((machine, route)) = &selection {
+                    println!("Opening Herdr on {} via {}", machine.name, route.name);
+                }
+                match launch {
+                    Ok(launch) => (Ok(launch.argv), launch.title, None, "Herdr"),
+                    Err(error) => (Err(error), "SSH Sessions".into(), None, "Herdr"),
+                }
+            }
         };
         connection::set_title(&title);
         match args.and_then(|args| connection::run_session(&args)) {
@@ -672,6 +715,14 @@ pub fn picker_loop(catalog: &Catalog) -> Result<()> {
                 notice =
                     "Use Enter for SSH login/key setup or R to choose a route, then try X again."
                         .into();
+            }
+            Ok(code) if session_name == "Herdr" && code != 0 => {
+                println!(
+                    "Herdr ended (exit {code}). Read its message above, then press Enter to return."
+                );
+                let mut line = String::new();
+                io::stdin().read_line(&mut line)?;
+                notice = "Use Enter for a plain SSH session, or H to try Herdr again.".into();
             }
             Ok(code) => {
                 notice = format!(

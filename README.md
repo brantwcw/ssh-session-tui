@@ -99,6 +99,19 @@ key-agent setup. Files needs authentication that works without a prompt; a
 password-only login is not enough. It never silently changes your route after
 a failure.
 
+## Herdr on the machine you selected (unreleased)
+
+Press **H** to open [Herdr](https://herdr.dev) for the selected row: local Herdr on
+**Local terminal**, or Herdr attached to that machine through its route. **Enter**
+still opens a plain SSH session.
+
+The first time this device opens Herdr on a machine, the picker asks before
+continuing, because Herdr's remote attach may install Herdr there. Herdr reads SSH
+aliases from your default SSH config, so a route imported from another config
+file is refused with a message instead of connecting somewhere else. Install
+Herdr separately; set `HERDR_BIN` to an absolute path if it is not on PATH. This
+key is not in a published release yet.
+
 ### Start Files from your server list
 
 **New in 0.8.0:** a Files chooser with named remote paths. This version is a
@@ -139,6 +152,7 @@ are passed literally: `~` and `$HOME` are not expanded by your local shell.
 | A / E / D | Add / edit / delete a machine |
 | R / I | Choose a route / import SSH hosts |
 | X | Open the optional SSH Files companion |
+| H | Open Herdr on the selected machine, or local Herdr (unreleased) |
 | Space / Ctrl+A | Mark one machine / all shown |
 | M / T | Move machines / edit tags |
 | S | Pull or publish the catalog |
